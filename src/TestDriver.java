@@ -9,6 +9,8 @@ public class TestDriver
         DataAnalyzer dataAnalyzer = new DataAnalyzer();
 
         dataAnalyzer.readFile("./Data/film_titles.txt");
-        dataAnalyzer.printTokens();
+        //dataAnalyzer.printTokens();
+        //dataAnalyzer.printFrequencies();
+        dataAnalyzer.printHighFrequencyTokens();
     }
 }
