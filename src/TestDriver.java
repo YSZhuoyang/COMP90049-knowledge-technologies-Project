@@ -6,11 +6,21 @@ public class TestDriver
 
     public static void main(String[] args)
     {
-        DataAnalyzer dataAnalyzer = new DataAnalyzer();
+        TitleFileLoader titleFileLoader = new TitleFileLoader();
+        ReviewsFileLoader reviewsFileLoader = new ReviewsFileLoader();
 
-        dataAnalyzer.readFile("./Data/film_titles.txt");
-        //dataAnalyzer.printTokens();
-        //dataAnalyzer.printFrequencies();
-        dataAnalyzer.printHighFrequencyTokens();
+        titleFileLoader.readFile("./Data/film_titles.txt");
+        //titleFileLoader.printTokens();
+        //titleFileLoader.printFrequencies();
+        //titleFileLoader.printWeight();
+        //titleFileLoader.printHighFrequencyTokens();
+
+        reviewsFileLoader.readFile("./Data/revs/");
+        //reviewsFileLoader.printHighFrequencyTokens();
+        //reviewsFileLoader.printFrequencies();
+
+        NGramAnalyzer nGramAnalyzer = new NGramAnalyzer(titleFileLoader, reviewsFileLoader);
+        nGramAnalyzer.process();
+        nGramAnalyzer.printMatches();
     }
 }
