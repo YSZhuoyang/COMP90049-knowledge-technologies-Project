@@ -10,11 +10,12 @@ public class NGramAnalyzer
 {
 	private TitleFileLoader titleFileLoader;
 	private ReviewsFileLoader reviewsFileLoader;
-	private HashMap<String, String> matches;
 	private HashMap<String, HashMap> reviewScoreHash;
-	private int subLength;
+	private int combLength;
 
-	public NGramAnalyzer(TitleFileLoader titleFileLoader, ReviewsFileLoader reviewsFileLoader)
+	public NGramAnalyzer(TitleFileLoader titleFileLoader,
+	                     ReviewsFileLoader reviewsFileLoader,
+	                     int lengthOfCombination)
 	{
 		this.titleFileLoader = titleFileLoader;
 		this.reviewsFileLoader = reviewsFileLoader;
@@ -24,8 +25,7 @@ public class NGramAnalyzer
 		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
 
 		reviewScoreHash = new HashMap<>(reviewCount);
-		matches = new HashMap<>(titleCount);
-		subLength = 2;
+		combLength = lengthOfCombination;
 
 		for (String review : reviewsStrArray)
 		{
@@ -100,7 +100,7 @@ public class NGramAnalyzer
 
 		if (score > 0f)
 		{
-			return score * 0.5f;
+			return score;
 		}
 		else
 		{
@@ -122,8 +122,8 @@ public class NGramAnalyzer
 			}
 		}
 
-		char[][] subCombsA = new char[tokenA.length() - 1][subLength];
-		char[][] subCombsB = new char[tokenB.length() - 1][subLength];
+		char[][] subCombsA = new char[tokenA.length() - 1][combLength];
+		char[][] subCombsB = new char[tokenB.length() - 1][combLength];
 		int s1 = subCombsA.length;
 		int s2 = subCombsB.length;
 		int intersection = 0;
@@ -158,7 +158,7 @@ public class NGramAnalyzer
 
 	private boolean compareSub(char[] combA, char[] combB)
 	{
-		for (int i = 0; i < subLength; i++)
+		for (int i = 0; i < combLength; i++)
 		{
 			if (combA[i] != combB[i])
 			{
@@ -199,11 +199,8 @@ public class NGramAnalyzer
 		System.out.println("Match: " + match + ": " + scoreMatch);
 	}
 
-	public void printMatches()
+	public HashMap<String, HashMap> getScores()
 	{
-		for (Map.Entry<String, String> entry : matches.entrySet())
-		{
-			System.out.println(entry.getKey() + " ==> " + entry.getValue() + "\n");
-		}
+		return reviewScoreHash;
 	}
 }

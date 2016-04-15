@@ -11,9 +11,10 @@ public class TitleFileLoader
 {
 	private TokenRetriever retriever;
 
-	public TitleFileLoader()
+	public TitleFileLoader(int tokenFrequencyLimit)
 	{
 		retriever = new TokenRetriever();
+		retriever.setFrequencyLimit(tokenFrequencyLimit);
 	}
 
 	public void readFile(String path)

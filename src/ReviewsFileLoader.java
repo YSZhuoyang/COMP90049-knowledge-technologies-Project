@@ -12,10 +12,15 @@ public class ReviewsFileLoader
 {
     private TokenRetriever retriever;
 
-    public ReviewsFileLoader()
+	// Settings
+	private int numberOfReviewsLoaded;
+
+
+    public ReviewsFileLoader(int numberOfReviewsLoaded, int tokenFrequencyLimit)
     {
         retriever = new TokenRetriever();
-        retriever.setFrequencyLimit(60);
+        retriever.setFrequencyLimit(tokenFrequencyLimit);
+	    this.numberOfReviewsLoaded = numberOfReviewsLoaded;
     }
 
     public void readFile(String path)
@@ -23,7 +28,7 @@ public class ReviewsFileLoader
         StringBuilder sb = new StringBuilder();
         String pathToFile;
 
-        for (int i = 1; i <= 10; i++)
+        for (int i = 1; i <= numberOfReviewsLoaded; i++)
         {
             /*if (i % 100 == 0)
             {

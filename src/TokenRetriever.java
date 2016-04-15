@@ -17,10 +17,9 @@ public class TokenRetriever
 	private final static String REGULAR_AND_COMB = "([\\w]+\\s*&\\s*[\\w]+)";
 	private final static String REGULAR_SLASH_COMB = "([\\w\\d]+\\s*-\\s*[\\w\\d]+)";
 	private final static String REGULAR_STAR_COMB = "([\\w\\d]+[*][\\w\\d]+)";
-	private final static String REGULAR_NOUN = "(([Aa]|(An)|(an)|(One)|(one)|(Two)|(two)|" +
+	/*private final static String REGULAR_NOUN = "(([Aa]|(An)|(an)|(One)|(one)|(Two)|(two)|" +
 	                                           "(Three)|(three)|(Four)|(four)|(Five)|(five)|(Six)|(six)|(Seven)|(seven)|(Eight)|" +
-	                                           "(eight)|(Nine)|(nine)|(Ten)|(ten)|(Eleven)|(Eleven)|(Twelve)|(twelve)|(\\d+)) \\w+)";
-
+	                                           "(eight)|(Nine)|(nine)|(Ten)|(ten)|(Eleven)|(Eleven)|(Twelve)|(twelve)|(\\d+)) \\w+)";*/
 	private final static String REGULAR_OTHER = "([^\\s\"()?:.,*!&-/]+)";
 	private final static String REGULAR_EXPR =
 			REGULAR_TIME + "|" +
@@ -87,8 +86,6 @@ public class TokenRetriever
 					// Add to filtering list
 					filtered.add(token);
 					tokenFrequency.remove(token);
-
-					//System.out.println("Filtered: " + token);
 				}
 				else
 				{
@@ -121,8 +118,6 @@ public class TokenRetriever
 				entry.getValue().removeAll(filtered);
 				entry.getValue().add(entry.getKey());
 				tokenFrequency.put(entry.getKey(), 1);
-
-				//System.out.println("Filtering: " + entry.getValue().get(0));
 			}
 			else
 			{
@@ -135,11 +130,11 @@ public class TokenRetriever
 	{
 		for (Map.Entry<String, Integer> entry : tokenFrequency.entrySet())
 		{
-			tokenWeight.put(entry.getKey(), 2f / (float) entry.getValue());
+			tokenWeight.put(entry.getKey(), 0.5f / (float) entry.getValue());
 		}
 
-		// Won't be used anymore
-		//tokenFrequency.clear();
+		// Frequencies data won't be used anymore
+		tokenFrequency.clear();
 	}
 
 	public void printTokens()

@@ -6,8 +6,8 @@ public class TestDriver
 
 	public static void main(String[] args)
 	{
-		TitleFileLoader titleFileLoader = new TitleFileLoader();
-		ReviewsFileLoader reviewsFileLoader = new ReviewsFileLoader();
+		TitleFileLoader titleFileLoader = new TitleFileLoader(60);
+		ReviewsFileLoader reviewsFileLoader = new ReviewsFileLoader(10, 60);
 
 		titleFileLoader.readFile("./Data/film_titles.txt");
 		//titleFileLoader.printTokens();
@@ -20,13 +20,18 @@ public class TestDriver
 		//reviewsFileLoader.printHighFrequencyTokens();
 		//reviewsFileLoader.printFrequencies();
 
-		NGramAnalyzer nGramAnalyzer = new NGramAnalyzer(titleFileLoader, reviewsFileLoader);
-		nGramAnalyzer.process();
-		nGramAnalyzer.printScore();
+		NGramAnalyzer nGramAnalyzer = new NGramAnalyzer(titleFileLoader, reviewsFileLoader, 2);
+		//nGramAnalyzer.process();
+		//nGramAnalyzer.printScore();
 
-		//LocalEditDistanceAnalyzer localEditDistanceAnalyzer =
-		//		new LocalEditDistanceAnalyzer(titleFileLoader, reviewsFileLoader);
+		LocalEditDistanceAnalyzer localEditDistanceAnalyzer =
+				new LocalEditDistanceAnalyzer(titleFileLoader, reviewsFileLoader);
 		//localEditDistanceAnalyzer.process();
 		//localEditDistanceAnalyzer.printScore();
+
+		TitleReviewMatcher titleReviewMatcher = new TitleReviewMatcher(nGramAnalyzer, localEditDistanceAnalyzer);
+		titleReviewMatcher.enableLocalEditDistanceAnalyzer(true);
+		titleReviewMatcher.process();
+		titleReviewMatcher.printScore();
 	}
 }

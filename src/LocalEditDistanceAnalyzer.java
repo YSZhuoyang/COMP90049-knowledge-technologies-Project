@@ -174,4 +174,9 @@ public class LocalEditDistanceAnalyzer
 
 		System.out.println("Match: " + match + ": " + scoreMatch);
 	}
+
+	public HashMap<String, HashMap> getScores()
+	{
+		return reviewScoreHash;
+	}
 }
