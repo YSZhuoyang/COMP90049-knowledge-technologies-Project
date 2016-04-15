@@ -10,195 +10,201 @@ import java.util.regex.Pattern;
  */
 public class TokenRetriever
 {
-    private final static String REGULAR_TIME = "([0-9][0-9]:[0-9][0-9])";
-    private final static String REGULAR_NUMBER = "([0-9]+,[0-9]+)";
-    private final static String REGULAR_ORG_NAME = "([A-Z]\\w*[.][A-Z]\\w*([.][A-Z]\\w*)*)";
-    private final static String REGULAR_PERSON_NAME = "([A-Z]\\w*[.] [A-Z]\\w*)";
-    private final static String REGULAR_AND_COMB = "([\\w]+\\s*&\\s*[\\w]+)";
-    private final static String REGULAR_SLASH_COMB = "([\\w\\d]+\\s*-\\s*[\\w\\d]+)";
-    private final static String REGULAR_STAR_COMB = "([\\w\\d]+[*][\\w\\d]+)";
-    private final static String REGULAR_NOUN = "(([Aa]|(An)|(an)|(One)|(one)|(Two)|(two)|" +
-            "(Three)|(three)|(Four)|(four)|(Five)|(five)|(Six)|(six)|(Seven)|(seven)|(Eight)|" +
-            "(eight)|(Nine)|(nine)|(Ten)|(ten)|(Eleven)|(Eleven)|(Twelve)|(twelve)|(\\d+)) \\w+)";
+	private final static String REGULAR_TIME = "([0-9][0-9](:[0-9][0-9])+)";
+	private final static String REGULAR_NUMBER = "([0-9]+(,[0-9]+)+)";
+	private final static String REGULAR_ORG_NAME = "(\\w+[.]\\w+([.]\\w+)*)";
+	private final static String REGULAR_PERSON_NAME = "((mr)|(mrs)|(ms)|(miss)[.] \\w+)";
+	private final static String REGULAR_AND_COMB = "([\\w]+\\s*&\\s*[\\w]+)";
+	private final static String REGULAR_SLASH_COMB = "([\\w\\d]+\\s*-\\s*[\\w\\d]+)";
+	private final static String REGULAR_STAR_COMB = "([\\w\\d]+[*][\\w\\d]+)";
+	private final static String REGULAR_NOUN = "(([Aa]|(An)|(an)|(One)|(one)|(Two)|(two)|" +
+	                                           "(Three)|(three)|(Four)|(four)|(Five)|(five)|(Six)|(six)|(Seven)|(seven)|(Eight)|" +
+	                                           "(eight)|(Nine)|(nine)|(Ten)|(ten)|(Eleven)|(Eleven)|(Twelve)|(twelve)|(\\d+)) \\w+)";
 
-    private final static String REGULAR_OTHER = "([^\\s\"()?:.,*!&-]+)";
-    private final static String REGULAR =
-            REGULAR_TIME + "|" +
-                    REGULAR_ORG_NAME + "|" +
-                    REGULAR_PERSON_NAME + "|" +
-                    REGULAR_NUMBER + "|" +
-                    REGULAR_AND_COMB + "|" +
-                    REGULAR_STAR_COMB + "|" +
-                    REGULAR_NOUN + "|" +
-                    REGULAR_SLASH_COMB + "|" +
-                    REGULAR_OTHER;
-
-
-    private HashMap<String, ArrayList> tokens;
-    private HashMap<String, Integer> tokenFrequency;
-    private HashMap<String, Float> tokenWeight;
-    private HashSet<String> filtered;
-    private Pattern wordPattern;
-
-    // Settings
-    private int frequencyLimit;
+	private final static String REGULAR_OTHER = "([^\\s\"()?:.,*!&-/]+)";
+	private final static String REGULAR_EXPR =
+			REGULAR_TIME + "|" +
+			REGULAR_ORG_NAME + "|" +
+			REGULAR_PERSON_NAME + "|" +
+			REGULAR_NUMBER + "|" +
+			REGULAR_AND_COMB + "|" +
+			REGULAR_STAR_COMB + "|" +
+			//REGULAR_NOUN + "|" +
+			REGULAR_SLASH_COMB + "|" +
+			REGULAR_OTHER;
 
 
-    public TokenRetriever()
-    {
-        tokens = new HashMap<>();
-        tokenFrequency = new HashMap<>();
-        tokenWeight = new HashMap<>();
-        filtered = new HashSet<>();
-        wordPattern = Pattern.compile(REGULAR);
+	private HashMap<String, ArrayList> tokens;
+	private HashMap<String, Integer> tokenFrequency;
+	private HashMap<String, Float> tokenWeight;
+	private HashSet<String> filtered;
+	private Pattern wordPattern;
 
-        frequencyLimit = 50;
-    }
+	// Settings
+	private int frequencyLimit;
 
-    public void setFrequencyLimit(int limit)
-    {
-        frequencyLimit = limit;
-    }
 
-    public void retrieveTokens(String line)
-    {
-        ArrayList<String> tokensInEachItem = new ArrayList<>();
+	public TokenRetriever()
+	{
+		tokens = new HashMap<>();
+		tokenFrequency = new HashMap<>();
+		tokenWeight = new HashMap<>();
+		filtered = new HashSet<>();
+		wordPattern = Pattern.compile(REGULAR_EXPR);
 
-        // Retrieve tokens matching the reg
-        Matcher matcher = wordPattern.matcher(line);
+		frequencyLimit = 50;
+	}
 
-        while (matcher.find())
-        {
-            String token = matcher.group();
+	public void setFrequencyLimit(int limit)
+	{
+		frequencyLimit = limit;
+	}
 
-            if (filtered.contains(token))
-            {
-                continue;
-            }
+	public void retrieveTokens(String line)
+	{
+		ArrayList<String> tokensInEachItem = new ArrayList<>();
 
-            tokensInEachItem.add(token);
+		// Retrieve tokens matching the reg
+		Matcher matcher = wordPattern.matcher(line);
 
-            // Added frequencies
-            if (tokenFrequency.containsKey(token))
-            {
-                if (tokenFrequency.get(token) >= frequencyLimit)
-                {
-                    // Add to filtering list
-                    filtered.add(token);
-                    tokenFrequency.remove(token);
+		while (matcher.find())
+		{
+			// All tokens would be lowercase, no need to call toLowercase again
+			String token = matcher.group();
 
-                    //System.out.println("Filtered: " + token);
-                }
-                else
-                {
-                    tokenFrequency.put(token, tokenFrequency.get(token) + 1);
-                }
-            }
-            else
-            {
-                tokenFrequency.put(token, 1);
-            }
-        }
+			if (filtered.contains(token))
+			{
+				continue;
+			}
 
-        tokens.put(line, tokensInEachItem);
-    }
+			tokensInEachItem.add(token);
 
-    private void removeCommonWords()
-    {
+			// Added frequencies
+			if (tokenFrequency.containsKey(token))
+			{
+				if (tokenFrequency.get(token) >= frequencyLimit)
+				{
+					// Add to filtering list
+					filtered.add(token);
+					tokenFrequency.remove(token);
 
-    }
+					//System.out.println("Filtered: " + token);
+				}
+				else
+				{
+					tokenFrequency.put(token, tokenFrequency.get(token) + 1);
+				}
+			}
+			else
+			{
+				tokenFrequency.put(token, 1);
+			}
+		}
 
-    public void filter()
-    {
-        removeCommonWords();
+		tokens.put(line, tokensInEachItem);
+	}
 
-        for (Map.Entry<String, ArrayList> entry: tokens.entrySet())
-        {
-            // Consider the case where all tokens retrieved are filtered
-            if (filtered.containsAll(entry.getValue()))
-            {
-                entry.getValue().removeAll(filtered);
-                entry.getValue().add(entry.getKey());
-                tokenFrequency.put(entry.getKey(), 1);
+	private void removeCommonWords()
+	{
 
-                //System.out.println("Filtering: " + entry.getValue().get(0));
-            }
-            else
-            {
-                entry.getValue().removeAll(filtered);
-            }
-        }
-    }
+	}
 
-    public void computeWeight()
-    {
-        for (Map.Entry<String, Integer> entry : tokenFrequency.entrySet())
-        {
-            tokenWeight.put(entry.getKey(), 50f / (float) entry.getValue());
-        }
+	public void filter()
+	{
+		removeCommonWords();
 
-        // Won't be used anymore
-        //tokenFrequency.clear();
-    }
+		for (Map.Entry<String, ArrayList> entry : tokens.entrySet())
+		{
+			// Consider the case where all tokens retrieved are filtered
+			if (filtered.containsAll(entry.getValue()))
+			{
+				entry.getValue().removeAll(filtered);
+				entry.getValue().add(entry.getKey());
+				tokenFrequency.put(entry.getKey(), 1);
 
-    public void printTokens()
-    {
-        for (Map.Entry<String, ArrayList> entry : tokens.entrySet())
-        {
-            System.out.print(entry.getKey() + ": ");
+				//System.out.println("Filtering: " + entry.getValue().get(0));
+			}
+			else
+			{
+				entry.getValue().removeAll(filtered);
+			}
+		}
+	}
 
-            for (String token : (ArrayList<String>) entry.getValue())
-            {
-                System.out.print("'" + token + "' ");
-            }
+	public void computeWeight()
+	{
+		for (Map.Entry<String, Integer> entry : tokenFrequency.entrySet())
+		{
+			tokenWeight.put(entry.getKey(), 2f / (float) entry.getValue());
+		}
 
-            System.out.println("");
-        }
-    }
+		// Won't be used anymore
+		//tokenFrequency.clear();
+	}
 
-    public void printFrequencies()
-    {
-        for (Map.Entry<String, Integer> entry : tokenFrequency.entrySet())
-        {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
-    }
+	public void printTokens()
+	{
+		for (Map.Entry<String, ArrayList> entry : tokens.entrySet())
+		{
+			System.out.print(entry.getKey() + "\n ==> ");
 
-    public void printWeight()
-    {
-        for (Map.Entry<String, Float> entry : tokenWeight.entrySet())
-        {
-            System.out.println("Weight of " + entry.getKey() + ": " + entry.getValue());
-        }
-    }
+			for (String token : (ArrayList<String>) entry.getValue())
+			{
+				System.out.print("'" + token + "' ");
+			}
 
-    public void printHighFrequencyTokens()
-    {
-        int counter = 0;
-        int counterOfTokenInItems = 0;
+			System.out.println("\n");
+		}
+	}
 
-        for (Map.Entry<String, Integer> entry : tokenFrequency.entrySet())
-        {
-            if (entry.getValue() > frequencyLimit)
-            {
-                counter++;
-                System.out.println(entry.getKey() + ": " + entry.getValue());
-            }
-        }
+	public void printFrequencies()
+	{
+		for (Map.Entry<String, Integer> entry : tokenFrequency.entrySet())
+		{
+			System.out.println(entry.getKey() + ": " + entry.getValue());
+		}
+	}
 
-        for (Map.Entry<String, ArrayList> entry : tokens.entrySet())
-        {
-            counterOfTokenInItems += entry.getValue().size();
-        }
+	public void printWeight()
+	{
+		for (Map.Entry<String, Float> entry : tokenWeight.entrySet())
+		{
+			System.out.println("Weight of " + entry.getKey() + ": " + entry.getValue());
+		}
+	}
 
-        System.out.println("Frequency limit: " + frequencyLimit);
-        System.out.println("Number of tokens: " + tokenFrequency.size());
-        System.out.println("Number of tokens in items: " + counterOfTokenInItems);
-        System.out.println("Number of tokens with high frequencies: " + counter);
-    }
+	public void printHighFrequencyTokens()
+	{
+		int counter = 0;
+		int counterOfTokenInItems = 0;
 
-    public HashMap<String, ArrayList> getTokens()
-    {
-        return tokens;
-    }
+		for (Map.Entry<String, Integer> entry : tokenFrequency.entrySet())
+		{
+			if (entry.getValue() > frequencyLimit)
+			{
+				counter++;
+				System.out.println(entry.getKey() + ": " + entry.getValue());
+			}
+		}
+
+		for (Map.Entry<String, ArrayList> entry : tokens.entrySet())
+		{
+			counterOfTokenInItems += entry.getValue().size();
+		}
+
+		System.out.println("Frequency limit: " + frequencyLimit);
+		System.out.println("Number of tokens: " + tokenFrequency.size());
+		System.out.println("Number of tokens in items: " + counterOfTokenInItems);
+		System.out.println("Number of tokens with high frequencies: " + counter);
+	}
+
+	public HashMap<String, ArrayList> getTokens()
+	{
+		return tokens;
+	}
+
+	public HashMap<String, Float> getTokenWeight()
+	{
+		return tokenWeight;
+	}
 }

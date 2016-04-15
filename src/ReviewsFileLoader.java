@@ -15,7 +15,7 @@ public class ReviewsFileLoader
     public ReviewsFileLoader()
     {
         retriever = new TokenRetriever();
-        retriever.setFrequencyLimit(80);
+        retriever.setFrequencyLimit(60);
     }
 
     public void readFile(String path)
@@ -23,7 +23,7 @@ public class ReviewsFileLoader
         StringBuilder sb = new StringBuilder();
         String pathToFile;
 
-        for (int i = 1; i <= 30000; i++)
+        for (int i = 1; i <= 10; i++)
         {
             /*if (i % 100 == 0)
             {
@@ -45,7 +45,7 @@ public class ReviewsFileLoader
 
                 while (line != null)
                 {
-                    sb.append(line);
+                    sb.append(line.toLowerCase());
                     line = br.readLine();
                 }
 
@@ -62,11 +62,22 @@ public class ReviewsFileLoader
         }
 
         retriever.filter();
+        retriever.computeWeight();
     }
 
     public HashMap<String, ArrayList> getTokens()
     {
         return retriever.getTokens();
+    }
+
+    public HashMap<String, Float> getTokenWeight()
+    {
+        return retriever.getTokenWeight();
+    }
+
+    public int getReviewCount()
+    {
+        return retriever.getTokens().size();
     }
 
     public void printTokens()

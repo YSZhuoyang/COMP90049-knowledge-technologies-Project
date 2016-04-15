@@ -1,140 +1,209 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by oscar on 4/14/16.
  */
 public class NGramAnalyzer
 {
-    private TitleFileLoader titleFileLoader;
-    private ReviewsFileLoader reviewsFileLoader;
-    private HashMap<String, String> matches;
-    private int subLength;
+	private TitleFileLoader titleFileLoader;
+	private ReviewsFileLoader reviewsFileLoader;
+	private HashMap<String, String> matches;
+	private HashMap<String, HashMap> reviewScoreHash;
+	private int subLength;
 
-    public NGramAnalyzer(TitleFileLoader titleFileLoader, ReviewsFileLoader reviewsFileLoader)
-    {
-        matches = new HashMap<>(titleFileLoader.getTitleCount());
-        subLength = 2;
+	public NGramAnalyzer(TitleFileLoader titleFileLoader, ReviewsFileLoader reviewsFileLoader)
+	{
+		this.titleFileLoader = titleFileLoader;
+		this.reviewsFileLoader = reviewsFileLoader;
 
-        this.titleFileLoader = titleFileLoader;
-        this.reviewsFileLoader = reviewsFileLoader;
-    }
+		int titleCount = titleFileLoader.getTitleCount();
+		int reviewCount = reviewsFileLoader.getReviewCount();
+		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
 
-    public void process()
-    {
-        HashMap<String, ArrayList> tokensInTitle = titleFileLoader.getTokens();
-        HashMap<String, ArrayList> tokensInReview = reviewsFileLoader.getTokens();
+		reviewScoreHash = new HashMap<>(reviewCount);
+		matches = new HashMap<>(titleCount);
+		subLength = 2;
 
-        for (Map.Entry<String, ArrayList> entryReview : tokensInReview.entrySet())
-        {
-            ArrayList tokensInEachReview = entryReview.getValue();
+		for (String review : reviewsStrArray)
+		{
+			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
+			reviewScoreHash.put(review, scoreForEachTitle);
+		}
+	}
 
-            // Reviews that already has been matched should not be considered
-            for (Map.Entry<String, ArrayList> entryTitle : tokensInTitle.entrySet())
-            {
-                ArrayList tokensInEachTitle = entryTitle.getValue();
+	public void process()
+	{
+		HashMap<String, ArrayList> tokensInTitle = titleFileLoader.getTokens();
+		HashMap<String, ArrayList> tokensInReview = reviewsFileLoader.getTokens();
+		HashMap<String, Float> titleTokenWeight = titleFileLoader.getTokenWeight();
+		HashMap<String, Float> reviewTokenWeight = reviewsFileLoader.getTokenWeight();
+		Set<String> titleArray = tokensInTitle.keySet();
 
-                if (titleMatchesReview(tokensInEachTitle, tokensInEachReview))
-                {
-                    matches.put(entryReview.getKey(), entryTitle.getKey());
+		//int count = 0;
 
-                    // Should be replaced by comparing with existing matches
-                    break;
-                }
-            }
-        }
-    }
+		for (Map.Entry<String, HashMap> entryReview : reviewScoreHash.entrySet())
+		{
+			/*if (count % 1000 == 0)
+			{
+				System.out.println("Processing: " + count + "th review");
+			}
 
-    private boolean titleMatchesReview(ArrayList<String> titleTokens, ArrayList<String> reviewTokens)
-    {
-        float ngramDistance;
+			count++;*/
 
-        for (String titleToken : titleTokens)
-        {
-            for (String reviewToken : reviewTokens)
-            {
-                ngramDistance = computeNGramDistance(titleToken, reviewToken);
+			String review = entryReview.getKey();
+			ArrayList tokensInEachReview = tokensInReview.get(review);
+			HashMap scoreForEachTitle = entryReview.getValue();
 
-                if (titleToken.length() - reviewToken.length() < 4 &&
-                    ngramDistance / (float) Math.min(titleToken.length(), reviewToken.length()) < 0.2f)
-                {
-                    System.out.println("Title token: " + titleToken + " matches review token: " + reviewToken);
+			for (String title : titleArray)
+			{
+				ArrayList<String> tokensInEachTitle = tokensInTitle.get(title);
 
-                    return true;
-                }
-            }
-        }
+				scoreForEachTitle.put(title, computeNGramScore(tokensInEachTitle,
+				                                               tokensInEachReview,
+				                                               titleTokenWeight,
+				                                               reviewTokenWeight));
+			}
+		}
+	}
 
-        return false;
-    }
+	private float computeNGramScore(ArrayList<String> titleTokens,
+	                                ArrayList<String> reviewTokens,
+	                                HashMap<String, Float> titleTokenWeight,
+	                                HashMap<String, Float> reviewTokenWeight)
+	{
+		float nGramDistance;
+		int tokenTitleLen;
+		int tokenReviewLen;
+		float score = 0f;
 
-    private int computeNGramDistance(String tokenA, String tokenB)
-    {
-        if (tokenA.length() == 1 || tokenB.length() == 1)
-        {
-            if (tokenA.equals(tokenB))
-            {
-                return 0;
-            }
-            else
-            {
-                return 10;
-            }
-        }
+		for (String titleToken : titleTokens)
+		{
+			tokenTitleLen = titleToken.length();
 
-        char[][] subCombsA = new char[tokenA.length() - 1][subLength];
-        char[][] subCombsB = new char[tokenB.length() - 1][subLength];
-        int s1 = subCombsA.length;
-        int s2 = subCombsB.length;
-        int intersection = 0;
+			for (String reviewToken : reviewTokens)
+			{
+				nGramDistance = computeNGramDistance(titleToken, reviewToken);
+				tokenReviewLen = reviewToken.length();
 
-        // Generate character combinations
-        for (int i = 0; i < s1; i++)
-        {
-            subCombsA[i][0] = tokenA.charAt(i);
-            subCombsA[i][1] = tokenA.charAt(i + 1);
-        }
+				// Consider the length of words when judging whether nGram distance meets the criteria
+				if (nGramDistance / (float) Math.min(tokenTitleLen, tokenReviewLen) < 0.2f)
+				{
+					//System.out.println("Title token: " + titleToken + " matches review token: " + reviewToken);
 
-        for (int i = 0; i < s2; i++)
-        {
-            subCombsB[i][0] = tokenB.charAt(i);
-            subCombsB[i][1] = tokenB.charAt(i + 1);
-        }
+					score += (titleTokenWeight.get(titleToken) + reviewTokenWeight.get(reviewToken)) * 0.5f;
+				}
+			}
+		}
 
-        // Compute distance
-        for (int i = 0; i < s1; i++)
-        {
-            for (int j = 0; j < s2; j++)
-            {
-                if (compareSub(subCombsA[i], subCombsB[j]))
-                {
-                    intersection++;
-                }
-            }
-        }
+		if (score > 0f)
+		{
+			return score * 0.5f;
+		}
+		else
+		{
+			return -0.5f;
+		}
+	}
 
-        return s1 + s2 - 2 * intersection;
-    }
+	private int computeNGramDistance(String tokenA, String tokenB)
+	{
+		if (tokenA.length() == 1 || tokenB.length() == 1)
+		{
+			if (tokenA.equals(tokenB))
+			{
+				return 0;
+			}
+			else
+			{
+				return 10;
+			}
+		}
 
-    private boolean compareSub(char[] combA, char[] combB)
-    {
-        for (int i = 0; i < subLength; i++)
-        {
-            if (combA[i] != combB[i])
-            {
-                return false;
-            }
-        }
+		char[][] subCombsA = new char[tokenA.length() - 1][subLength];
+		char[][] subCombsB = new char[tokenB.length() - 1][subLength];
+		int s1 = subCombsA.length;
+		int s2 = subCombsB.length;
+		int intersection = 0;
 
-        return true;
-    }
+		// Generate character combinations
+		for (int i = 0; i < s1; i++)
+		{
+			subCombsA[i][0] = tokenA.charAt(i);
+			subCombsA[i][1] = tokenA.charAt(i + 1);
+		}
 
-    public void printMatches()
-    {
-        for (Map.Entry<String, String> entry : matches.entrySet())
-        {
-            System.out.println(entry.getKey() + " ==> " + entry.getValue() + "\n");
-        }
-    }
+		for (int i = 0; i < s2; i++)
+		{
+			subCombsB[i][0] = tokenB.charAt(i);
+			subCombsB[i][1] = tokenB.charAt(i + 1);
+		}
+
+		// Compute distance
+		for (int i = 0; i < s1; i++)
+		{
+			for (int j = 0; j < s2; j++)
+			{
+				if (compareSub(subCombsA[i], subCombsB[j]))
+				{
+					intersection++;
+				}
+			}
+		}
+
+		return s1 + s2 - 2 * intersection;
+	}
+
+	private boolean compareSub(char[] combA, char[] combB)
+	{
+		for (int i = 0; i < subLength; i++)
+		{
+			if (combA[i] != combB[i])
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public void printScore()
+	{
+		String match = "";
+		float scoreMatch = 0;
+
+		for (Map.Entry<String, HashMap> entry : reviewScoreHash.entrySet())
+		{
+			HashMap<String, Float> titleScores = entry.getValue();
+
+			System.out.println(entry.getKey());
+
+			for (Map.Entry<String, Float> score : titleScores.entrySet())
+			{
+				if (score.getValue() > scoreMatch)
+				{
+					scoreMatch = score.getValue();
+					match = score.getKey();
+				}
+
+				System.out.print(score.getKey() + ": " + score.getValue() + "\n");
+			}
+
+			System.out.println("\n");
+
+			break;
+		}
+
+		System.out.println("Match: " + match + ": " + scoreMatch);
+	}
+
+	public void printMatches()
+	{
+		for (Map.Entry<String, String> entry : matches.entrySet())
+		{
+			System.out.println(entry.getKey() + " ==> " + entry.getValue() + "\n");
+		}
+	}
 }
