@@ -10,29 +10,42 @@ public class LocalEditDistanceAnalyzer
 
 	private int numAppearances;
 	private float maxLocalDistance;
-	private HashMap<String, HashMap> reviewScoreHash;
+	private HashMap<String, HashMap> matches;
 
 	// Settings
 	private float bottomLimitOfLocalMatch = 0.8f;
 	private float maxLocalDistanceWeight = 1f;
 	private float numAppearanceWeight = 0.2f;
+	private float threashold;
+	private int numberOfReviewsProcessed;
 
 
-	public LocalEditDistanceAnalyzer(TitleFileLoader titleFileLoader, ReviewsFileLoader reviewsFileLoader)
+	public LocalEditDistanceAnalyzer(TitleFileLoader titleFileLoader, ReviewsFileLoader reviewsFileLoader, float threashold)
 	{
 		this.titleFileLoader = titleFileLoader;
 		this.reviewsFileLoader = reviewsFileLoader;
+		this.threashold = threashold;
+		// Process top 10 reviews
+		numberOfReviewsProcessed = 10;
 
 		int titleCount = titleFileLoader.getTitleCount();
-		int reviewCount = reviewsFileLoader.getReviewCount();
 		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
 
-		reviewScoreHash = new HashMap<>(reviewCount);
+		matches = new HashMap<>(numberOfReviewsProcessed);
+
+		// Initialize hash table of matches of each review
+		int count = 0;
 
 		for (String review : reviewsStrArray)
 		{
+			if (count >= numberOfReviewsProcessed)
+			{
+				break;
+			}
+
 			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
-			reviewScoreHash.put(review, scoreForEachTitle);
+			matches.put(review, scoreForEachTitle);
+			count++;
 		}
 	}
 
@@ -45,7 +58,7 @@ public class LocalEditDistanceAnalyzer
 
 		int count = 0;
 
-		for (Map.Entry<String, HashMap> entry : reviewScoreHash.entrySet())
+		for (Map.Entry<String, HashMap> entry : matches.entrySet())
 		{
 			if (count % 2 == 0)
 			{
@@ -65,14 +78,20 @@ public class LocalEditDistanceAnalyzer
 				if (titleLen > 10)
 				{
 					computeLocalEditDistance(titleLen, reviewLen, title, review);
-					scoreForEachTitle.put(title, mark());
-				}
-				else
-				{
-					scoreForEachTitle.put(title, 0f);
+					float score = mark();
+
+					if (score > threashold)
+					{
+						scoreForEachTitle.put(title, score);
+					}
 				}
 			}
 		}
+	}
+
+	public void setProcessingNumber(int num)
+	{
+		numberOfReviewsProcessed = num;
 	}
 
 	private void computeLocalEditDistance(int titleLen, int reviewLen, String title, String review)
@@ -145,38 +164,34 @@ public class LocalEditDistanceAnalyzer
 		return maxLocalDistance * maxLocalDistanceWeight + numAppearances * numAppearanceWeight;
 	}
 
-	public void printScore()
+	public void printMatches()
 	{
-		String match = "";
-		float scoreMatch = 0;
-
-		for (Map.Entry<String, HashMap> entry : reviewScoreHash.entrySet())
+		for (Map.Entry<String, HashMap> entry : matches.entrySet())
 		{
+			String match = "";
+			float highestScore = 0;
+
 			HashMap<String, Float> titleScores = entry.getValue();
 
 			System.out.println(entry.getKey());
 
 			for (Map.Entry<String, Float> score : titleScores.entrySet())
 			{
-				if (score.getValue() > scoreMatch)
+				if (score.getValue() > highestScore)
 				{
-					scoreMatch = score.getValue();
 					match = score.getKey();
+					highestScore = score.getValue();
 				}
 
 				System.out.print(score.getKey() + ": " + score.getValue() + "\n");
 			}
 
-			System.out.println("\n");
-
-			break;
+			System.out.println("\nBest Match: <<" + match + ">> score: " + highestScore + "\n\n");
 		}
-
-		System.out.println("Match: " + match + ": " + scoreMatch);
 	}
 
-	public HashMap<String, HashMap> getScores()
+	public HashMap<String, HashMap> getMatches()
 	{
-		return reviewScoreHash;
+		return matches;
 	}
 }

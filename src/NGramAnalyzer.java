@@ -10,27 +10,40 @@ public class NGramAnalyzer
 {
 	private TitleFileLoader titleFileLoader;
 	private ReviewsFileLoader reviewsFileLoader;
-	private HashMap<String, HashMap> reviewScoreHash;
+	private HashMap<String, HashMap> matches;
+	private float threshold;
 	private int combLength;
+	private int numberOfReviewsProcessed;
 
 	public NGramAnalyzer(TitleFileLoader titleFileLoader,
 	                     ReviewsFileLoader reviewsFileLoader,
-	                     int lengthOfCombination)
+	                     int lengthOfCombination,
+	                     float threshold)
 	{
 		this.titleFileLoader = titleFileLoader;
 		this.reviewsFileLoader = reviewsFileLoader;
+		this.threshold = threshold;
+		combLength = lengthOfCombination;
+		// Process top 10 reviews
+		numberOfReviewsProcessed = 10;
+		matches = new HashMap<>(numberOfReviewsProcessed);
 
 		int titleCount = titleFileLoader.getTitleCount();
-		int reviewCount = reviewsFileLoader.getReviewCount();
 		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
 
-		reviewScoreHash = new HashMap<>(reviewCount);
-		combLength = lengthOfCombination;
+		// Initialize hash table of matches of each review
+		int count = 0;
 
 		for (String review : reviewsStrArray)
 		{
+			if (count >= numberOfReviewsProcessed)
+			{
+				break;
+			}
+
 			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
-			reviewScoreHash.put(review, scoreForEachTitle);
+			matches.put(review, scoreForEachTitle);
+			count++;
 		}
 	}
 
@@ -42,16 +55,16 @@ public class NGramAnalyzer
 		HashMap<String, Float> reviewTokenWeight = reviewsFileLoader.getTokenWeight();
 		Set<String> titleArray = tokensInTitle.keySet();
 
-		//int count = 0;
+		int count = 0;
 
-		for (Map.Entry<String, HashMap> entryReview : reviewScoreHash.entrySet())
+		for (Map.Entry<String, HashMap> entryReview : matches.entrySet())
 		{
-			/*if (count % 1000 == 0)
+			//if (count % 20 == 0)
 			{
 				System.out.println("Processing: " + count + "th review");
 			}
 
-			count++;*/
+			count++;
 
 			String review = entryReview.getKey();
 			ArrayList tokensInEachReview = tokensInReview.get(review);
@@ -60,13 +73,22 @@ public class NGramAnalyzer
 			for (String title : titleArray)
 			{
 				ArrayList<String> tokensInEachTitle = tokensInTitle.get(title);
+				float nGramScore = computeNGramScore(tokensInEachTitle,
+				                                     tokensInEachReview,
+				                                     titleTokenWeight,
+				                                     reviewTokenWeight);
 
-				scoreForEachTitle.put(title, computeNGramScore(tokensInEachTitle,
-				                                               tokensInEachReview,
-				                                               titleTokenWeight,
-				                                               reviewTokenWeight));
+				if (nGramScore > threshold)
+				{
+					scoreForEachTitle.put(title, nGramScore);
+				}
 			}
 		}
+	}
+
+	public void setProcessingNumber(int num)
+	{
+		numberOfReviewsProcessed = num;
 	}
 
 	private float computeNGramScore(ArrayList<String> titleTokens,
@@ -169,38 +191,34 @@ public class NGramAnalyzer
 		return true;
 	}
 
-	public void printScore()
+	public void printMatches()
 	{
-		String match = "";
-		float scoreMatch = 0;
-
-		for (Map.Entry<String, HashMap> entry : reviewScoreHash.entrySet())
+		for (Map.Entry<String, HashMap> entry : matches.entrySet())
 		{
+			String match = "";
+			float highestScore = 0;
+
 			HashMap<String, Float> titleScores = entry.getValue();
 
 			System.out.println(entry.getKey());
 
 			for (Map.Entry<String, Float> score : titleScores.entrySet())
 			{
-				if (score.getValue() > scoreMatch)
+				if (score.getValue() > highestScore)
 				{
-					scoreMatch = score.getValue();
 					match = score.getKey();
+					highestScore = score.getValue();
 				}
 
 				System.out.print(score.getKey() + ": " + score.getValue() + "\n");
 			}
 
-			System.out.println("\n");
-
-			break;
+			System.out.println("\nBest Match: <<" + match + ">> score: " + highestScore + "\n\n");
 		}
-
-		System.out.println("Match: " + match + ": " + scoreMatch);
 	}
 
-	public HashMap<String, HashMap> getScores()
+	public HashMap<String, HashMap> getMatches()
 	{
-		return reviewScoreHash;
+		return matches;
 	}
 }

@@ -8,17 +8,19 @@ public class TitleReviewMatcher
 {
 	private NGramAnalyzer nGramAnalyzer;
 	private LocalEditDistanceAnalyzer localEditDistanceAnalyzer;
-	private HashMap<String, HashMap> matchingScores;
+	private HashMap<String, HashMap> matches;
 
 	// Settings
 	private boolean nGramAnalyzerEnabled;
 	private boolean localEditDistanceAnalyzerEnabled;
+
 
 	public TitleReviewMatcher(NGramAnalyzer nGramAnalyzer, LocalEditDistanceAnalyzer localEditDistanceAnalyzer)
 	{
 		this.nGramAnalyzer = nGramAnalyzer;
 		this.localEditDistanceAnalyzer = localEditDistanceAnalyzer;
 
+		// Enable nGram analyzer, disable local edit distance analyzer by default
 		nGramAnalyzerEnabled = true;
 		localEditDistanceAnalyzerEnabled = false;
 	}
@@ -38,63 +40,67 @@ public class TitleReviewMatcher
 		if (nGramAnalyzerEnabled && localEditDistanceAnalyzerEnabled)
 		{
 			nGramAnalyzer.process();
-			matchingScores = nGramAnalyzer.getScores();
+			matches = nGramAnalyzer.getMatches();
 
 			localEditDistanceAnalyzer.process();
-			HashMap<String, HashMap> localEditDistanceScores = localEditDistanceAnalyzer.getScores();
+			HashMap<String, HashMap> localEditDistanceMatches = localEditDistanceAnalyzer.getMatches();
 
-			for (Map.Entry<String, HashMap> entry : matchingScores.entrySet())
+			for (Map.Entry<String, HashMap> entry : matches.entrySet())
 			{
 				String review = entry.getKey();
 				HashMap<String, Float> nGramScoreForEachTitle = entry.getValue();
-				HashMap<String, Float> localScoreForEachTitle = localEditDistanceScores.get(review);
+				HashMap<String, Float> localScoreForEachTitle = localEditDistanceMatches.get(review);
 
-				for (Map.Entry<String, Float> titleScoreEntry : nGramScoreForEachTitle.entrySet())
+				for (Map.Entry<String, Float> localTitleScoreEntry : localScoreForEachTitle.entrySet())
 				{
-					String title = titleScoreEntry.getKey();
-					titleScoreEntry.setValue(titleScoreEntry.getValue() + localScoreForEachTitle.get(title));
+					String title = localTitleScoreEntry.getKey();
+
+					if (nGramScoreForEachTitle.containsKey(title))
+					{
+						nGramScoreForEachTitle.put(title, nGramScoreForEachTitle.get(title) + localTitleScoreEntry.getValue());
+					}
+					else
+					{
+						nGramScoreForEachTitle.put(title, localTitleScoreEntry.getValue());
+					}
 				}
 			}
 		}
 		else if (localEditDistanceAnalyzerEnabled)
 		{
 			localEditDistanceAnalyzer.process();
-			matchingScores = localEditDistanceAnalyzer.getScores();
+			matches = localEditDistanceAnalyzer.getMatches();
 		}
 		else if (nGramAnalyzerEnabled)
 		{
 			nGramAnalyzer.process();
-			matchingScores = nGramAnalyzer.getScores();
+			matches = nGramAnalyzer.getMatches();
 		}
 	}
 
-	public void printScore()
+	public void printMatches()
 	{
-		String match = "";
-		float scoreMatch = 0;
-
-		for (Map.Entry<String, HashMap> entry : matchingScores.entrySet())
+		for (Map.Entry<String, HashMap> entry : matches.entrySet())
 		{
+			String match = "";
+			float highestScore = 0;
+
 			HashMap<String, Float> titleScores = entry.getValue();
 
 			System.out.println(entry.getKey());
 
 			for (Map.Entry<String, Float> score : titleScores.entrySet())
 			{
-				if (score.getValue() > scoreMatch)
+				if (score.getValue() > highestScore)
 				{
-					scoreMatch = score.getValue();
 					match = score.getKey();
+					highestScore = score.getValue();
 				}
 
 				System.out.print(score.getKey() + ": " + score.getValue() + "\n");
 			}
 
-			System.out.println("\n");
-
-			break;
+			System.out.println("\nBest Match: <<" + match + ">> score: " + highestScore + "\n\n");
 		}
-
-		System.out.println("Match: " + match + ": " + scoreMatch);
 	}
 }
