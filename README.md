@@ -1,7 +1,45 @@
-# KTProject
-Ranking movies based on reviews.
+## Knowledge Technology project - Ranking movies
+* Matching movie reviews with movie titles.
+* Ranking movies based on reviews associated with the title.
 
+## Approximate matching algorithms
+* NGram algorithm for matching tokens (words or phrases) extracted from titles and reviews.
+* Smith Waterman algorithm calculating local edit distance.
 
-Terms of Use:
+## File list
+    ./
+    README.md
+    KTProject.iml
+    .gitignore
+    
+    ./src
+    TestDriver.java
+    TokenRetriever.java
+    LocalEditDistanceAnalyzer.java
+    NGramAnalyzer.java
+    ReviewsFileLoader.java
+    TitleFileLoader.java
+    TitleReviewMatcher.java
+    
+    ./Data
+    film_titles.txt
+    
+    ./Data/revs
+    1.txt
+    ...
+    49995.txt
 
-Andrew L. Maas, Raymond E. Daly, Peter T. Pham, Dan Huang, Andrew Y. Ng, and Christopher Potts. (2011). Learning Word Vectors for Sentiment Analysis. The 49th Annual Meeting of the Association for Computational Linguistics (ACL 2011).
+## How to run file
+* Install and open Intellij
+* Clone the project, navigate to the project directory and open the project
+* Add an application run/debug entry in edit configuration with TestDriver.java, and run the project
+* The output will appear in the console
+
+## Author
+* Sangzhuoyang Yu
+
+##Terms of Use
+
+    Andrew L. Maas, Raymond E. Daly, Peter T. Pham, Dan Huang, Andrew Y. Ng, and Christopher Potts. (2011).
+    Learning Word Vectors for Sentiment Analysis.
+    The 49th Annual Meeting of the Association for Computational Linguistics (ACL 2011).
