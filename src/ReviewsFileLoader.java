@@ -30,11 +30,6 @@ public class ReviewsFileLoader
 
         for (int i = 1; i <= numberOfReviewsLoaded; i++)
         {
-            /*if (i % 100 == 0)
-            {
-                System.out.println("Processing: " + i);
-            }*/
-
             pathToFile = path + i + ".txt";
 
             if (!Files.exists(Paths.get(pathToFile)))

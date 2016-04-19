@@ -20,33 +20,16 @@ public class LocalEditDistanceAnalyzer
 	private int numberOfReviewsProcessed;
 
 
-	public LocalEditDistanceAnalyzer(TitleFileLoader titleFileLoader, ReviewsFileLoader reviewsFileLoader, float threashold)
+	public LocalEditDistanceAnalyzer(TitleFileLoader titleFileLoader,
+	                                 ReviewsFileLoader reviewsFileLoader,
+	                                 int numberOfReviewsProcessed,
+	                                 float threashold)
 	{
 		this.titleFileLoader = titleFileLoader;
 		this.reviewsFileLoader = reviewsFileLoader;
 		this.threashold = threashold;
-		// Process top 10 reviews
-		numberOfReviewsProcessed = 10;
 
-		int titleCount = titleFileLoader.getTitleCount();
-		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
-
-		matches = new HashMap<>(numberOfReviewsProcessed);
-
-		// Initialize hash table of matches of each review
-		int count = 0;
-
-		for (String review : reviewsStrArray)
-		{
-			if (count >= numberOfReviewsProcessed)
-			{
-				break;
-			}
-
-			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
-			matches.put(review, scoreForEachTitle);
-			count++;
-		}
+		setNumberOfReviewsProcessed(numberOfReviewsProcessed);
 	}
 
 	public void process()
@@ -75,7 +58,7 @@ public class LocalEditDistanceAnalyzer
 			{
 				titleLen = title.length();
 
-				if (titleLen > 10)
+				//if (titleLen > 10)
 				{
 					computeLocalEditDistance(titleLen, reviewLen, title, review);
 					float score = mark();
@@ -89,9 +72,28 @@ public class LocalEditDistanceAnalyzer
 		}
 	}
 
-	public void setProcessingNumber(int num)
+	public void setNumberOfReviewsProcessed(int num)
 	{
 		numberOfReviewsProcessed = num;
+		matches = new HashMap<>(numberOfReviewsProcessed);
+
+		int titleCount = titleFileLoader.getTitleCount();
+		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
+
+		// Initialize hash table of matches of each review
+		int count = 0;
+
+		for (String review : reviewsStrArray)
+		{
+			if (count >= numberOfReviewsProcessed)
+			{
+				break;
+			}
+
+			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
+			matches.put(review, scoreForEachTitle);
+			count++;
+		}
 	}
 
 	private void computeLocalEditDistance(int titleLen, int reviewLen, String title, String review)

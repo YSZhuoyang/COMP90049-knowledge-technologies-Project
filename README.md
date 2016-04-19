@@ -32,8 +32,8 @@
 ## How to run file
 * Install and open Intellij
 * Clone the project, navigate to the project directory and open the project
-* Add an application run/debug entry in edit configuration with TestDriver.java, and run the project
-* The output will appear in the console
+* Add an application run/debug entry in edit configuration and select TestDriver.java
+* After running the project, the output file named matches.txt will appear under the ./Output/ directory
 
 ## Author
 * Sangzhuoyang Yu

@@ -1,5 +1,9 @@
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by oscar on 4/15/16.
@@ -84,7 +88,6 @@ public class TitleReviewMatcher
 		{
 			String match = "";
 			float highestScore = 0;
-
 			HashMap<String, Float> titleScores = entry.getValue();
 
 			System.out.println(entry.getKey());
@@ -102,5 +105,56 @@ public class TitleReviewMatcher
 
 			System.out.println("\nBest Match: <<" + match + ">> score: " + highestScore + "\n\n");
 		}
+	}
+
+	public void writeToAFile()
+	{
+		StringBuilder sb = new StringBuilder();
+
+		for (Map.Entry<String, HashMap> entry : matches.entrySet())
+		{
+			String match = "";
+			float highestScore = 0;
+			HashMap<String, Float> titleScores = entry.getValue();
+
+			sb.append(entry.getKey() + "\n\nMatches:\n");
+
+			for (Map.Entry<String, Float> score : titleScores.entrySet())
+			{
+				if (score.getValue() > highestScore)
+				{
+					match = score.getKey();
+					highestScore = score.getValue();
+				}
+
+				sb.append(score.getKey() + ": " + score.getValue() + "\n");
+			}
+
+			sb.append("\nBest Match: <<" + match + ">> score: " + highestScore + "\n\n\n");
+		}
+
+		// Write to a txt file under output directory
+		PrintWriter writer = null;
+
+		try
+		{
+			writer = new PrintWriter("./Output/matches.txt", "UTF-8");
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			e.printStackTrace();
+		}
+
+		writer.println(sb.toString());
+		writer.close();
+	}
+
+	public HashMap<String, HashMap> getMatches()
+	{
+		return matches;
 	}
 }

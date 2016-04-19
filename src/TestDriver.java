@@ -6,20 +6,34 @@ public class TestDriver
 
 	public static void main(String[] args)
 	{
+		// Create file loaders reading all titles and reviews,
+		// set the token frequency limit to be 60 for titles,
+		// set the token frequency limit to be 100 for titles,
+		// tokens of which the frequency exceeds the limit will
+		// be filtered (frequency is calculated based on all files)
 		TitleFileLoader titleFileLoader = new TitleFileLoader(60);
 		ReviewsFileLoader reviewsFileLoader = new ReviewsFileLoader(50000, 100);
 
 		titleFileLoader.readFile("./Data/film_titles.txt");
 		reviewsFileLoader.readFile("./Data/revs/");
 
-		NGramAnalyzer nGramAnalyzer = new NGramAnalyzer(titleFileLoader, reviewsFileLoader, 2, 0.2f);
+		// Create ngram analyzer, set the threshold to be 0.2.
+		// Create local distance analyzer, set the threshold to be 0.7.
+		// Reviews of which the matching score is less than threshold will be filtered.
+		// Process 20 reviews
+		NGramAnalyzer nGramAnalyzer = new NGramAnalyzer(titleFileLoader, reviewsFileLoader, 20, 2, 0.2f);
 		LocalEditDistanceAnalyzer localEditDistanceAnalyzer =
-				new LocalEditDistanceAnalyzer(titleFileLoader, reviewsFileLoader, 0.7f);
+				new LocalEditDistanceAnalyzer(titleFileLoader, reviewsFileLoader, 20, 0.7f);
 
 		TitleReviewMatcher titleReviewMatcher = new TitleReviewMatcher(nGramAnalyzer, localEditDistanceAnalyzer);
-		titleReviewMatcher.enableLocalEditDistanceAnalyzer(false);
-		titleReviewMatcher.enableNGramAnalyzer(true);
+		titleReviewMatcher.enableLocalEditDistanceAnalyzer(true);
+		titleReviewMatcher.enableNGramAnalyzer(false);
 		titleReviewMatcher.process();
-		titleReviewMatcher.printMatches();
+		titleReviewMatcher.writeToAFile();
+
+		// Judge whether the reviews reflect positive or negative sentiment
+		Evaluator evaluator = new Evaluator(titleReviewMatcher.getMatches());
+		evaluator.evaluate();
+		evaluator.writeToAFile();
 	}
 }

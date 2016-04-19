@@ -17,6 +17,7 @@ public class NGramAnalyzer
 
 	public NGramAnalyzer(TitleFileLoader titleFileLoader,
 	                     ReviewsFileLoader reviewsFileLoader,
+	                     int numberOfReviewsProcessed,
 	                     int lengthOfCombination,
 	                     float threshold)
 	{
@@ -24,27 +25,8 @@ public class NGramAnalyzer
 		this.reviewsFileLoader = reviewsFileLoader;
 		this.threshold = threshold;
 		combLength = lengthOfCombination;
-		// Process top 10 reviews
-		numberOfReviewsProcessed = 10;
-		matches = new HashMap<>(numberOfReviewsProcessed);
 
-		int titleCount = titleFileLoader.getTitleCount();
-		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
-
-		// Initialize hash table of matches of each review
-		int count = 0;
-
-		for (String review : reviewsStrArray)
-		{
-			if (count >= numberOfReviewsProcessed)
-			{
-				break;
-			}
-
-			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
-			matches.put(review, scoreForEachTitle);
-			count++;
-		}
+		setNumberOfReviewsProcessed(numberOfReviewsProcessed);
 	}
 
 	public void process()
@@ -59,10 +41,7 @@ public class NGramAnalyzer
 
 		for (Map.Entry<String, HashMap> entryReview : matches.entrySet())
 		{
-			//if (count % 20 == 0)
-			{
-				System.out.println("Processing: " + count + "th review");
-			}
+			System.out.println("Processing: " + count + "th review");
 
 			count++;
 
@@ -86,9 +65,28 @@ public class NGramAnalyzer
 		}
 	}
 
-	public void setProcessingNumber(int num)
+	public void setNumberOfReviewsProcessed(int num)
 	{
 		numberOfReviewsProcessed = num;
+		matches = new HashMap<>(numberOfReviewsProcessed);
+
+		int titleCount = titleFileLoader.getTitleCount();
+		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
+
+		// Initialize hash table of matches of each review
+		int count = 0;
+
+		for (String review : reviewsStrArray)
+		{
+			if (count >= numberOfReviewsProcessed)
+			{
+				break;
+			}
+
+			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
+			matches.put(review, scoreForEachTitle);
+			count++;
+		}
 	}
 
 	private float computeNGramScore(ArrayList<String> titleTokens,
@@ -115,7 +113,7 @@ public class NGramAnalyzer
 				{
 					//System.out.println("Title token: " + titleToken + " matches review token: " + reviewToken);
 
-					score += (titleTokenWeight.get(titleToken) + reviewTokenWeight.get(reviewToken)) * 0.5f;
+					score += titleTokenWeight.get(titleToken);//(titleTokenWeight.get(titleToken) + reviewTokenWeight.get(reviewToken)) * 0.5f;
 				}
 			}
 		}

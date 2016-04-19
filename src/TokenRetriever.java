@@ -17,10 +17,7 @@ public class TokenRetriever
 	private final static String REGULAR_AND_COMB = "([\\w]+\\s*&\\s*[\\w]+)";
 	private final static String REGULAR_SLASH_COMB = "([\\w\\d]+\\s*-\\s*[\\w\\d]+)";
 	private final static String REGULAR_STAR_COMB = "([\\w\\d]+[*][\\w\\d]+)";
-	/*private final static String REGULAR_NOUN = "(([Aa]|(An)|(an)|(One)|(one)|(Two)|(two)|" +
-	                                           "(Three)|(three)|(Four)|(four)|(Five)|(five)|(Six)|(six)|(Seven)|(seven)|(Eight)|" +
-	                                           "(eight)|(Nine)|(nine)|(Ten)|(ten)|(Eleven)|(Eleven)|(Twelve)|(twelve)|(\\d+)) \\w+)";*/
-	private final static String REGULAR_OTHER = "([^\\s\"()?:.,*!&-/]+)";
+	private final static String REGULAR_OTHER = "([^\\s\"()?:.,*!&-/<>]+)";
 	private final static String REGULAR_EXPR =
 			REGULAR_TIME + "|" +
 			REGULAR_ORG_NAME + "|" +
@@ -28,7 +25,6 @@ public class TokenRetriever
 			REGULAR_NUMBER + "|" +
 			REGULAR_AND_COMB + "|" +
 			REGULAR_STAR_COMB + "|" +
-			//REGULAR_NOUN + "|" +
 			REGULAR_SLASH_COMB + "|" +
 			REGULAR_OTHER;
 
