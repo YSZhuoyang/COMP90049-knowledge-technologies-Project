@@ -1,4 +1,4 @@
-## Knowledge Technology project - Ranking movies
+## Knowledge Technology project - Reviewing movies
 * Matching movie reviews with movie titles.
 * Ranking movies based on reviews associated with the title.
 * Evaluate the review sentiment using Maven api (whether the title associated with the review is positive or negative)
