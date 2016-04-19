@@ -111,9 +111,7 @@ public class NGramAnalyzer
 				// Consider the length of words when judging whether nGram distance meets the criteria
 				if (nGramDistance / (float) Math.min(tokenTitleLen, tokenReviewLen) < 0.2f)
 				{
-					//System.out.println("Title token: " + titleToken + " matches review token: " + reviewToken);
-
-					score += titleTokenWeight.get(titleToken);//(titleTokenWeight.get(titleToken) + reviewTokenWeight.get(reviewToken)) * 0.5f;
+					score += titleTokenWeight.get(titleToken);
 				}
 			}
 		}
