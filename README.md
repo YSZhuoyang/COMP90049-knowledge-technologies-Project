@@ -42,8 +42,9 @@
 ## How to run file
 * Install and open Intellij
 * Clone the project, navigate to the project directory and open the project
-* Go to 'File -> Project structure -> Libraries' to check whether library dependencies are imported
+* Go to 'File -> Project structure -> Libraries' to check whether maven library dependencies are imported
 * Add an application run/debug entry in edit configuration and select TestDriver.java
+* By default, the file loaders will read all files into memory however both analyzers only process 20 reviews, for the purpose of speed and convenience for manually checking correctness. But it can be configered by modifying the input parameter in 'TestDriver.java'. Details can be found in 'TestDriver.java' file
 * After running the project, output files named 'NGram matches.txt', 'Local edit distance matches.txt' and 'evaluations.txt' will appear under './Output/' directory
 
 ## Author

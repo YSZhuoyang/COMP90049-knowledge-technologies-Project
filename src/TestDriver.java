@@ -20,12 +20,14 @@ public class TestDriver
 		// Create ngram analyzer, set the threshold to be 0.2.
 		// Create local distance analyzer, set the threshold to be 0.7.
 		// Reviews of which the matching score is less than threshold will be filtered.
-		// Process 20 reviews
+		// Process 20 reviews for the purpose of speed, which can be changed by modifying
+		// the third input param of nGramAnalyzer and localEditDistanceAnalyzer.
 		NGramAnalyzer nGramAnalyzer = new NGramAnalyzer(titleFileLoader, reviewsFileLoader, 20, 2, 0.2f);
 		LocalEditDistanceAnalyzer localEditDistanceAnalyzer =
 				new LocalEditDistanceAnalyzer(titleFileLoader, reviewsFileLoader, 20, 0.7f);
 
 		TitleReviewMatcher titleReviewMatcher = new TitleReviewMatcher(nGramAnalyzer, localEditDistanceAnalyzer);
+		// Enable local edit distance analyzer and disable ngram analyzer
 		titleReviewMatcher.enableLocalEditDistanceAnalyzer(true);
 		titleReviewMatcher.enableNGramAnalyzer(false);
 		titleReviewMatcher.process();
