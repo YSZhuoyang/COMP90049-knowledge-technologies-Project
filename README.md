@@ -1,6 +1,7 @@
 ## Knowledge Technology project - Ranking movies
 * Matching movie reviews with movie titles.
 * Ranking movies based on reviews associated with the title.
+* Evaluate the review sentiment using Maven api (whether the title associated with the review is positive or negative)
 
 ## Approximate matching algorithms
 * NGram algorithm for matching tokens (words or phrases) extracted from titles and reviews.
@@ -20,6 +21,10 @@
     ReviewsFileLoader.java
     TitleFileLoader.java
     TitleReviewMatcher.java
+    Evaluator.java
+    
+    ./lib
+    ...     // External libraries
     
     ./Data
     film_titles.txt
@@ -28,12 +33,17 @@
     1.txt
     ...
     49995.txt
+    
+    ./Output
+    matches.txt
+    evaluations.txt
 
 ## How to run file
 * Install and open Intellij
 * Clone the project, navigate to the project directory and open the project
+* Go to 'File -> Project structure -> Libraries' to check whether library dependencies are imported
 * Add an application run/debug entry in edit configuration and select TestDriver.java
-* After running the project, the output file named matches.txt will appear under the ./Output/ directory
+* After running the project, output files named 'matches.txt' and 'evaluations.txt' will appear under './Output/' directory
 
 ## Author
 * Sangzhuoyang Yu
