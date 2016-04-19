@@ -29,7 +29,13 @@ public class TestDriver
 		titleReviewMatcher.enableLocalEditDistanceAnalyzer(true);
 		titleReviewMatcher.enableNGramAnalyzer(false);
 		titleReviewMatcher.process();
-		titleReviewMatcher.writeToAFile();
+		titleReviewMatcher.writeToAFile("Local edit distance matches");
+
+		// Enable ngram analyzer and disable local edit distance analyzer
+		titleReviewMatcher.enableLocalEditDistanceAnalyzer(false);
+		titleReviewMatcher.enableNGramAnalyzer(true);
+		titleReviewMatcher.process();
+		titleReviewMatcher.writeToAFile("NGram matches");
 
 		// Judge whether the reviews reflect positive or negative sentiment
 		Evaluator evaluator = new Evaluator(titleReviewMatcher.getMatches());

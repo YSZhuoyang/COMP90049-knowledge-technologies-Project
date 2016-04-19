@@ -35,7 +35,8 @@
     49995.txt
     
     ./Output
-    matches.txt
+    NGram matches.txt
+    Local edit distance matches.txt
     evaluations.txt
 
 ## How to run file
@@ -43,7 +44,7 @@
 * Clone the project, navigate to the project directory and open the project
 * Go to 'File -> Project structure -> Libraries' to check whether library dependencies are imported
 * Add an application run/debug entry in edit configuration and select TestDriver.java
-* After running the project, output files named 'matches.txt' and 'evaluations.txt' will appear under './Output/' directory
+* After running the project, output files named 'NGram matches.txt', 'Local edit distance matches.txt' and 'evaluations.txt' will appear under './Output/' directory
 
 ## Author
 * Sangzhuoyang Yu

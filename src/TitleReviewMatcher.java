@@ -107,7 +107,7 @@ public class TitleReviewMatcher
 		}
 	}
 
-	public void writeToAFile()
+	public void writeToAFile(String fileName)
 	{
 		StringBuilder sb = new StringBuilder();
 
@@ -138,7 +138,7 @@ public class TitleReviewMatcher
 
 		try
 		{
-			writer = new PrintWriter("./Output/matches.txt", "UTF-8");
+			writer = new PrintWriter("./Output/" + fileName + ".txt", "UTF-8");
 		}
 		catch (FileNotFoundException e)
 		{
