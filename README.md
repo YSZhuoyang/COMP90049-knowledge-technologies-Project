@@ -38,21 +38,24 @@
     NGram matches.txt
     Local edit distance matches.txt
     evaluations.txt
-
-    ./KTProject.jar // Executable
+    
+    ./KTProject.jar     // Executable
 
 ## How to build and run project
 * Install and open Intellij
 * Clone the project, navigate to the project directory and open the project
 * Go to 'File -> Project structure -> Libraries' to check whether maven library dependencies are imported
 * Add an application run/debug entry in edit configuration and select TestDriver.java
-* By default, the file loaders will read all files into memory however both analyzers only process 20 reviews, for the purpose of speed and convenience for manually checking correctness. But it can be configered by modifying the input parameter in 'TestDriver.java'. Details can be found in 'TestDriver.java' file
+* By default, the file loaders will read all files into memory however both analyzers only process 20 reviews, for the purpose of speed and convenience for manually checking correctness. But it can be configured by modifying the input parameter in 'TestDriver.java'. Details can be found in 'TestDriver.java' file
 * After running the project, output files named 'NGram matches.txt', 'Local edit distance matches.txt' and 'evaluations.txt' will appear under './Output/' directory
 
 ## How to execute
 * An executable named 'KTProject.jar' under the submission folder has been exported and can be executed directly.
-* Open a terminal under the submission folder, type '$java -jar KTProject.jar'
-* Note that the executable file must be in the same directory where folder 'Data' and 'Output' are located
+* Open a terminal under the submission folder, type:
+
+        $java -jar KTProject.jar
+
+* Note that the executable file must be in the same directory where folder 'Data' and 'Output' are located as well
 
 ## Author
 * Sangzhuoyang Yu
