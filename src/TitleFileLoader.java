@@ -24,14 +24,17 @@ public class TitleFileLoader
 			BufferedReader br = new BufferedReader(new FileReader(path));
 
 			String line = br.readLine();
+			int count = 0;
 
 			while (line != null)
 			{
 				retriever.retrieveTokens(line.toLowerCase());
 				line = br.readLine();
+				count++;
 			}
 
 			br.close();
+			System.out.println(count + " titles loaded!");
 		}
 		catch (Exception e)
 		{

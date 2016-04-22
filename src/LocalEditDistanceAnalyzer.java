@@ -30,6 +30,30 @@ public class LocalEditDistanceAnalyzer
 		this.threashold = threashold;
 
 		setNumberOfReviewsProcessed(numberOfReviewsProcessed);
+		initData();
+	}
+
+	public void initData()
+	{
+		matches = new HashMap<>(numberOfReviewsProcessed);
+
+		int titleCount = titleFileLoader.getTitleCount();
+		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
+
+		// Initialize hash table of matches of each review
+		int count = 0;
+
+		for (String review : reviewsStrArray)
+		{
+			if (count >= numberOfReviewsProcessed)
+			{
+				break;
+			}
+
+			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
+			matches.put(review, scoreForEachTitle);
+			count++;
+		}
 	}
 
 	public void process()
@@ -75,25 +99,6 @@ public class LocalEditDistanceAnalyzer
 	public void setNumberOfReviewsProcessed(int num)
 	{
 		numberOfReviewsProcessed = num;
-		matches = new HashMap<>(numberOfReviewsProcessed);
-
-		int titleCount = titleFileLoader.getTitleCount();
-		Set<String> reviewsStrArray = reviewsFileLoader.getTokens().keySet();
-
-		// Initialize hash table of matches of each review
-		int count = 0;
-
-		for (String review : reviewsStrArray)
-		{
-			if (count >= numberOfReviewsProcessed)
-			{
-				break;
-			}
-
-			HashMap<String, Float> scoreForEachTitle = new HashMap<>(titleCount);
-			matches.put(review, scoreForEachTitle);
-			count++;
-		}
 	}
 
 	private void computeLocalEditDistance(int titleLen, int reviewLen, String title, String review)

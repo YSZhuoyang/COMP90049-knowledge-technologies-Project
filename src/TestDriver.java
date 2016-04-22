@@ -34,6 +34,7 @@ public class TestDriver
 		titleReviewMatcher.writeToAFile("Local edit distance matches");
 
 		// Enable ngram analyzer and disable local edit distance analyzer
+		titleReviewMatcher.reset();
 		titleReviewMatcher.enableLocalEditDistanceAnalyzer(false);
 		titleReviewMatcher.enableNGramAnalyzer(true);
 		titleReviewMatcher.process();

@@ -27,6 +27,7 @@ public class ReviewsFileLoader
     {
         StringBuilder sb = new StringBuilder();
         String pathToFile;
+        int count = 0;
 
         for (int i = 1; i <= numberOfReviewsLoaded; i++)
         {
@@ -50,6 +51,7 @@ public class ReviewsFileLoader
                 }
 
                 br.close();
+	            count++;
             }
             catch (Exception e)
             {
@@ -60,6 +62,8 @@ public class ReviewsFileLoader
             retriever.retrieveTokens(sb.toString());
             sb.setLength(0);
         }
+
+	    System.out.println(count + " reviews loaded!");
 
         retriever.filter();
         retriever.computeWeight();

@@ -39,6 +39,12 @@ public class TitleReviewMatcher
 		localEditDistanceAnalyzerEnabled = localEditDistanceSwitch;
 	}
 
+	public void reset()
+	{
+		nGramAnalyzer.initData();
+		localEditDistanceAnalyzer.initData();
+	}
+
 	public void process()
 	{
 		if (nGramAnalyzerEnabled && localEditDistanceAnalyzerEnabled)
