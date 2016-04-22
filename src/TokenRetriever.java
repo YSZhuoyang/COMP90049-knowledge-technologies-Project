@@ -28,7 +28,6 @@ public class TokenRetriever
 			REGULAR_SLASH_COMB + "|" +
 			REGULAR_OTHER;
 
-
 	private HashMap<String, ArrayList> tokens;
 	private HashMap<String, Integer> tokenFrequency;
 	private HashMap<String, Float> tokenWeight;

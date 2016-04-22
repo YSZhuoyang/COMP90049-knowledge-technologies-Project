@@ -16,18 +16,18 @@ public class LocalEditDistanceAnalyzer
 	private float bottomLimitOfLocalMatch = 0.8f;
 	private float maxLocalDistanceWeight = 1f;
 	private float numAppearanceWeight = 0.2f;
-	private float threashold;
+	private float threshold;
 	private int numberOfReviewsProcessed;
 
 
 	public LocalEditDistanceAnalyzer(TitleFileLoader titleFileLoader,
 	                                 ReviewsFileLoader reviewsFileLoader,
 	                                 int numberOfReviewsProcessed,
-	                                 float threashold)
+	                                 float threshold)
 	{
 		this.titleFileLoader = titleFileLoader;
 		this.reviewsFileLoader = reviewsFileLoader;
-		this.threashold = threashold;
+		this.threshold = threshold;
 
 		setNumberOfReviewsProcessed(numberOfReviewsProcessed);
 		initData();
@@ -87,7 +87,7 @@ public class LocalEditDistanceAnalyzer
 					computeLocalEditDistance(titleLen, reviewLen, title, review);
 					float score = mark();
 
-					if (score > threashold)
+					if (score > threshold)
 					{
 						scoreForEachTitle.put(title, score);
 					}
