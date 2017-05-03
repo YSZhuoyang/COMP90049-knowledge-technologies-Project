@@ -1,7 +1,7 @@
 ## Knowledge Technology project - Reviewing movies
 * Matching movie reviews with movie titles.
 * Ranking movies based on reviews associated with the title.
-* Evaluate the review sentiment using Maven api (whether the title associated with the review is positive or negative)
+* Perform sentiment analysis of the review using [Mashape Free Natural Language Processing Service](https://market.mashape.com/loudelement/free-natural-language-processing-service).
 
 ## Approximate matching algorithms
 * NGram algorithm for matching tokens (words or phrases) extracted from titles and reviews.
@@ -56,9 +56,6 @@
         $java -jar KTProject.jar
 
 * Note that the executable file must be in the same directory where folder 'Data' and 'Output' are located as well
-
-## Author
-* Sangzhuoyang Yu
 
 ##Terms of Use
 
